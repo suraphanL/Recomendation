@@ -3,6 +3,7 @@ from flask import request, jsonify
 from collections import defaultdict
 from surprise import Dataset, Reader
 import pandas as pd
+import os
 
 def load_model(model_filename):
     print (">> Loading dump")
@@ -17,7 +18,6 @@ app = Flask(__name__)
 model_filename = "./model/model.pickle"
 ratings_path = './data/ratings.csv'
 movies_path = './data/movies.csv'
-loaded_model = load_model(model_filename)
 
 
 def get_top_n(predictions, n=10):
@@ -47,21 +47,30 @@ def before_first_request_func():
     print("This function will run once")
     global top_n
     global ratings_df
-    global movies_df        
+    global movies_df
+    print(movies_path)        
     movies_df = pd.read_csv(movies_path)
+    print(movies_df)
     ratings_df = pd.read_csv(ratings_path)
     ratings_df = ratings_df.dropna()
     ratings_df['userId'] = ratings_df['userId'].astype('int64')
     ratings_df['movieId'] = ratings_df['movieId'].astype('int64')
+    print(ratings_df)
     reader = Reader(rating_scale=(0.5, 5))
     data = Dataset.load_from_df(ratings_df[['userId','movieId','rating']], reader)
     trainset = data.build_full_trainset()
+    print("Data Done")
+    loaded_model = load_model(model_filename)
+    print("Model done")
     predictions = loaded_model.test(trainset.build_anti_testset())
+    print("predictions Done")
     top_n = get_top_n(predictions, n=10)
-    calculate_top_rate_movies()    
+    calculate_top_rate_movies()
+    print("Done")
     
 @app.route('/recommendations', methods=['GET'])
 def recommendations():
+    print("recommendations")
     userId = int(request.args['user_id'])
     returnMetadata = request.args.get('returnMetadata', False, type=bool)
     print(returnMetadata)
@@ -99,3 +108,7 @@ def movie_detail_by_id(id):
 def get_feature_by_user_id(id):
     movies = ratings_df[ratings_df['userId'] == id]['movieId'].astype('str').tolist()
     return movies
+
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=True, host='0.0.0.0', port=port)
