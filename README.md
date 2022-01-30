@@ -24,6 +24,7 @@
     3. Dockerfile
         Create Docker image: docker image build -t flask_docker .
         Run docker image: docker run -p 5674:5000 -it -d flask_docker
+        Docker hub: https://hub.docker.com/repository/docker/rpzzzzzz/flask_recommendation
     4. Postman: 
         http://localhost:5674/recommendations?user_id=418&returnMetadata=true
         http://localhost:5674/features?user_id=18
