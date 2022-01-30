@@ -19,7 +19,6 @@ model_filename = "./model/model.pickle"
 ratings_path = './data/ratings.csv'
 movies_path = './data/movies.csv'
 
-
 def get_top_n(predictions, n=10):
   top_n = defaultdict(list)
   for uid, mid, true_r, est, _ in predictions:
