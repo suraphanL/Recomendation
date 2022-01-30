@@ -49,12 +49,10 @@ def before_first_request_func():
     global movies_df
     print(movies_path)        
     movies_df = pd.read_csv(movies_path)
-    print(movies_df)
     ratings_df = pd.read_csv(ratings_path)
     ratings_df = ratings_df.dropna()
     ratings_df['userId'] = ratings_df['userId'].astype('int64')
     ratings_df['movieId'] = ratings_df['movieId'].astype('int64')
-    print(ratings_df)
     reader = Reader(rating_scale=(0.5, 5))
     data = Dataset.load_from_df(ratings_df[['userId','movieId','rating']], reader)
     trainset = data.build_full_trainset()
